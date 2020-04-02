@@ -1,0 +1,5 @@
+Привет, мир!
+Каждый может писать!
+
+src\test\java\test1.txt
+src\test\java\test2.txt
