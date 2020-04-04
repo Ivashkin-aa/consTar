@@ -37,7 +37,7 @@ public class Tar {
             return;
         }
 
-        //if (con == null) {
+        if (spl==null) {
             try {
                 PrintWriter record = new PrintWriter(con);
                 List<String> info = new ArrayList<String>();
@@ -56,7 +56,7 @@ public class Tar {
             } catch (IOException e) {
                 System.err.println(e.getMessage());
             }
-        //} else {
+        } else {
             try {
                 ReversedLinesFileReader str = new ReversedLinesFileReader(spl);
                 String line = str.readLine();
@@ -81,4 +81,4 @@ public class Tar {
             }
         }
     }
-//}
+}
