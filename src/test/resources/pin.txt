@@ -1,0 +1,7 @@
+Каждый может писать?
+!Yeap!
+Привет, мир?
+            XYZ
+
+src\test\resources\test2.txt 2
+src\test\resources\test1.txt 2
