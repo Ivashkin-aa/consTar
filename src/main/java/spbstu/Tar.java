@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class Tar {
     @Option(name = "-out", metaVar = "Connect", usage = "Mix files", forbids = {"-u"})
@@ -26,11 +26,11 @@ public class Tar {
     private String sep = File.separator;
     private String dir = "src" + sep + "test" + sep + "resources";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         new Tar().launch(args);
     }
 
-    private void launch(String[] args) {
+    private void launch(String[] args) throws IOException {
         CmdLineParser parser = new CmdLineParser(this);
 
         try {
@@ -42,30 +42,32 @@ public class Tar {
             return;
         }
 
+        /*
+          @value info - связь между, файлом и его последней строкой. Выходной файл
+         * @value content - связь между, файлом и его последней строкой . Входной файл
+         * @value dirNew  - создание директории с именем файла
+         */
+
         if (spl == null) {
-            try {
-                PrintWriter record = new PrintWriter(dir + sep + con);
-                Map<String, Integer> info = new HashMap<>();
-                for (File f : inputFilesName) {
-                    try (BufferedReader str = new BufferedReader(new FileReader(f))) {
-                        String line;
-                        Integer cout = 0;
-                        while ((line = str.readLine()) != null) {
-                            record.println(line);
-                            cout++;
-                        }
-                        info.put(f.toString(), cout);
+            PrintWriter record = new PrintWriter(dir + sep + con);
+            Map<String, Integer> info = new TreeMap<>();
+            for (File f : inputFilesName) {
+                try (BufferedReader str = new BufferedReader(new FileReader(f))) {
+                    String line;
+                    Integer cout = 0;
+                    while ((line = str.readLine()) != null) {
+                        record.println(line);
+                        cout++;
                     }
+                    info.put(f.toString(), cout);
                 }
-                record.write("\n");
-                for (Map.Entry<String, Integer> pair : info.entrySet())
-                    record.println(pair.getKey() + " " + pair.getValue());
-                record.close();
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
             }
+            record.write("\n");
+            for (Map.Entry<String, Integer> pair : info.entrySet())
+                record.println(pair.getKey() + " " + pair.getValue());
+            record.close();
         } else {
-            try (ReversedLinesFileReader str = new ReversedLinesFileReader(spl)) {
+            try (ReversedLinesFileReader str = new ReversedLinesFileReader(spl, UTF_8)) {
                 String line = str.readLine();
                 if (line != null) {
                     Map<String, Integer> content = new HashMap<>();
@@ -77,14 +79,17 @@ public class Tar {
                         content.put(String.valueOf(name), s);
                         line = str.readLine();
                     }
+
                     Path drNew = Paths.get(String.valueOf(spl));
                     String name = String.valueOf(drNew.getFileName());
-                    String[] nameForDir = name.split("\\.txt");
-                    boolean dirNew = new File(dir + sep + nameForDir[0]).mkdir();
+                    String[] sr = name.split("\\.txt");
+                    String nameForDir = sr[0];
+                    boolean dirNew = new File(dir + sep + nameForDir).mkdir();
+
                     try (BufferedReader s = new BufferedReader(new FileReader(spl))) {
                         String line2 = s.readLine();
                         for (Map.Entry<String, Integer> pair : content.entrySet()) {
-                            PrintWriter rec = new PrintWriter(dir + sep + nameForDir[0] + sep + pair.getKey());
+                            PrintWriter rec = new PrintWriter(dir + sep + nameForDir + sep + pair.getKey());
                             Integer cout = pair.getValue();
                             while (cout != 0) {
                                 rec.println(line2);
@@ -95,8 +100,6 @@ public class Tar {
                         }
                     }
                 }
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
             }
         }
     }
