@@ -47,6 +47,7 @@ public class Tar {
          * @value content - связь между, файлом и его последней строкой . Входной файл
          * @value dirNew  - создание директории с именем файла
          */
+
         if (spl == null) {
             PrintWriter record = new PrintWriter(con);
             Map<String, Integer> info = new TreeMap<>();
@@ -87,10 +88,11 @@ public class Tar {
                                 name = name.substring(0, name.length() - 3);
                             name = name + ".txt";
                         }
-                        content.put(name, s);
 
+                        content.put(name, s);
                         line = str.readLine();
                     }
+
                     //создание папки с именем текстового файла
                     Path drNew = Paths.get(String.valueOf(spl));
                     String name = String.valueOf(drNew.getFileName());
