@@ -1,6 +1,7 @@
 package spbstu;
 
 import org.apache.commons.io.input.ReversedLinesFileReader;
+import org.apache.commons.io.FilenameUtils;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.CmdLineParser;
@@ -24,7 +25,6 @@ public class Tar {
     private ArrayList<File> inputFilesName;
 
     private String sep = File.separator;
-    private String dir = "src" + sep + "test" + sep + "resources";
 
     public static void main(String[] args) throws IOException {
         new Tar().launch(args);
@@ -43,13 +43,12 @@ public class Tar {
         }
 
         /*
-          @value info - связь между, файлом и его последней строкой. Выходной файл
+         * @value info - связь между, файлом и его последней строкой. Выходной файл
          * @value content - связь между, файлом и его последней строкой . Входной файл
          * @value dirNew  - создание директории с именем файла
          */
-
         if (spl == null) {
-            PrintWriter record = new PrintWriter(dir + sep + con);
+            PrintWriter record = new PrintWriter(con);
             Map<String, Integer> info = new TreeMap<>();
             for (File f : inputFilesName) {
                 try (BufferedReader str = new BufferedReader(new FileReader(f))) {
@@ -70,26 +69,38 @@ public class Tar {
             try (ReversedLinesFileReader str = new ReversedLinesFileReader(spl, UTF_8)) {
                 String line = str.readLine();
                 if (line != null) {
-                    Map<String, Integer> content = new HashMap<>();
+                    Map<String, Integer> content = new TreeMap<>();
                     while (!line.equals("")) {
                         String[] part = line.split(" ");
                         Path dr = Paths.get(part[0]);
-                        Path name = dr.getFileName();
+                        Path nameFile = dr.getFileName();
+                        String name = nameFile.toString();
                         Integer s = Integer.valueOf(part[1]);
-                        content.put(String.valueOf(name), s);
+
+                        //проверка имени файла на уникальность
+                        int count = 0;
+                        while (content.containsKey(name)) {
+                            count++;
+                            name = FilenameUtils.removeExtension(name);
+                            name = name + "(" + count + ")";
+                            if (content.containsKey(name + ".txt"))
+                                name = name.substring(0, name.length() - 3);
+                            name = name + ".txt";
+                        }
+                        content.put(name, s);
+
                         line = str.readLine();
                     }
-
+                    //создание папки с именем текстового файла
                     Path drNew = Paths.get(String.valueOf(spl));
                     String name = String.valueOf(drNew.getFileName());
-                    String[] sr = name.split("\\.txt");
-                    String nameForDir = sr[0];
-                    boolean dirNew = new File(dir + sep + nameForDir).mkdir();
+                    String nameForDir = FilenameUtils.removeExtension(name);
+                    boolean dirNew = new File(nameForDir).mkdir();
 
                     try (BufferedReader s = new BufferedReader(new FileReader(spl))) {
                         String line2 = s.readLine();
                         for (Map.Entry<String, Integer> pair : content.entrySet()) {
-                            PrintWriter rec = new PrintWriter(dir + sep + nameForDir + sep + pair.getKey());
+                            PrintWriter rec = new PrintWriter(nameForDir + sep + pair.getKey());
                             Integer cout = pair.getValue();
                             while (cout != 0) {
                                 rec.println(line2);
