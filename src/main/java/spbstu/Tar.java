@@ -83,9 +83,10 @@ public class Tar {
                         while (content.containsKey(name)) {
                             count++;
                             name = FilenameUtils.removeExtension(name);
-                            name = name + "(" + count + ")";
+                            String num = "(" + count + ")";
+                            name = name + num;
                             if (content.containsKey(name + ".txt"))
-                                name = name.substring(0, name.length() - 3);
+                                name = name.substring(0, name.length() - num.length());
                             name = name + ".txt";
                         }
 

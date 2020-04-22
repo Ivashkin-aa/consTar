@@ -1,0 +1,7 @@
+XY
+AS
+Gf
+
+gh.txt 1
+src\gh.txt 1
+src\test\gh.txt 1
