@@ -49,7 +49,9 @@ public class Tar {
          * @value count - счетчик, для изменения имени файла, при одинаковых именах файла
          */
 
-        if (spl == null) {
+        if (spl == null && con == null)
+            System.err.println("Command Line: -u filename.txt OR file1.txt file2.txt ... -out output.txt");
+        else if (spl == null) {
             PrintWriter record = new PrintWriter(con);
             Map<String, Integer> info = new TreeMap<>();
             for (File f : inputFilesName) {
@@ -63,10 +65,11 @@ public class Tar {
                     info.put(f.toString(), cout);
                 }
             }
-            record.write("\n");
+            record.write(System.lineSeparator());
             for (Map.Entry<String, Integer> pair : info.entrySet())
                 record.println(pair.getKey() + " " + pair.getValue());
             record.close();
+            System.out.println("Done!");
         } else {
             try (ReversedLinesFileReader str = new ReversedLinesFileReader(spl, UTF_8)) {
                 String line = str.readLine();
@@ -112,6 +115,7 @@ public class Tar {
                                 cout--;
                             }
                             rec.close();
+                            System.out.println("Done!");
                         }
                     }
                 }
