@@ -53,7 +53,7 @@ public class Tar {
             System.err.println("Command Line: -u filename.txt OR file1.txt file2.txt ... -out output.txt");
         else if (spl == null) {
             PrintWriter record = new PrintWriter(con);
-            Map<String, Integer> info = new TreeMap<>();
+            Map<String, Integer> info = new LinkedHashMap<>();
             for (File f : inputFilesName) {
                 try (BufferedReader str = new BufferedReader(new FileReader(f))) {
                     String line;
@@ -74,7 +74,7 @@ public class Tar {
             try (ReversedLinesFileReader str = new ReversedLinesFileReader(spl, UTF_8)) {
                 String line = str.readLine();
                 if (line != null) {
-                    Map<String, Integer> content = new TreeMap<>();
+                    Map<String, Integer> content = new LinkedHashMap<>();
                     while (!line.equals("")) {
                         String[] part = line.split(" ");
                         Path dr = Paths.get(part[0]);
