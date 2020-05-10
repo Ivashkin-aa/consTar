@@ -74,7 +74,7 @@ public class Tar {
             try (ReversedLinesFileReader str = new ReversedLinesFileReader(spl, UTF_8)) {
                 String line = str.readLine();
                 if (line != null) {
-                    Map<String, Integer> content = new LinkedHashMap<>();
+                    Map<String, Integer> content = new TreeMap<>();
                     while (!line.equals("")) {
                         String[] part = line.split(" ");
                         Path dr = Paths.get(part[0]);
@@ -115,11 +115,11 @@ public class Tar {
                                 cout--;
                             }
                             rec.close();
-                            System.out.println("Done!");
                         }
                     }
                 }
             }
+            System.out.println("Done!");
         }
     }
 }
